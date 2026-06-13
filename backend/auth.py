@@ -2,7 +2,6 @@ from datetime import datetime,timedelta,timezone
 from typing import Annotated
 import jwt
 from fastapi import HTTPException,status
-from fastapi.security import OAuth2PasswordBearer,OAuth2PasswordRequestForm
 from pwdlib import PasswordHash
 from pydantic import BaseModel
 from jwt.exceptions import InvalidTokenError
@@ -10,12 +9,12 @@ from backend.config import ALGORITHM,SECRET_KEY,ACCESS_TOKEN_EXPIRES_MINUTES
 from backend.models import users
 from backend.database import SessionDep
 from sqlmodel import select
+from uuid import UUID
 class Token(BaseModel):
     access_token:str
     token_type:str
 password_hash=PasswordHash.recommended()
 DUMMY_HASH=password_hash.hash("test@1234")
-oauth2_scheme=OAuth2PasswordBearer(tokenUrl="/cp_analyzer/signup")
 
 def create_access_token(data:dict,expires_delta:timedelta|None=None):
     data_encode=data.copy()
@@ -68,3 +67,25 @@ async def authenticate_user(user:users.UserCreate,session):
         data={"sub":str(db_user.id)}
     )
     return Token(access_token=access_token,token_type="Bearer")
+
+async def get_user(token:str,session):
+    try:
+        payload=jwt.decode(token,SECRET_KEY,algorithms=[ALGORITHM])
+        id=UUID(payload.get("sub"))
+        if id is None:
+            raise HTTPException(status_code=401,detail="User is unauthorized")
+    except InvalidTokenError:
+        raise HTTPException(status_code=401,detail="User is unauthorized")
+    db_user=session.get(users.User,id)
+    if db_user is None:
+        raise HTTPException(status_code=422,detail="wow")
+    user=users.UserRead(
+        username=db_user.username,
+        id=db_user.id,
+        leetcode_handle=db_user.leetcode_handle,
+        codeforces_handle=db_user.codeforces_handle
+    )
+    if user is None:
+        raise HTTPException(status_code=401,detail="User is unauthorized")
+    return user
+        
