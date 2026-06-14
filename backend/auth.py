@@ -25,6 +25,16 @@ def create_access_token(data:dict,expires_delta:timedelta|None=None):
     data_encode.update({"exp":expire})
     encode_jwt=jwt.encode(data_encode,SECRET_KEY,algorithm=ALGORITHM)
     return encode_jwt
+async def decode_token(token:str)->UUID:
+    try:
+        payload=jwt.decode(token,SECRET_KEY,algorithms=[ALGORITHM])
+        id=UUID(payload.get("sub"))
+        if id is None:
+            raise HTTPException(status_code=401,detail="User is unauthorized")
+    except InvalidTokenError:
+        raise HTTPException(status_code=401,detail="User is unauthorized")
+    return id
+
 
 def get_password_hash(password):
     return password_hash.hash(password)
@@ -60,7 +70,7 @@ async def authenticate_user(user:users.UserCreate,session):
         )
     if not verify_password(user.password,db_user.hashed_password):
         raise HTTPException(
-            status_code="404",
+            status_code=404,
             detail="username or password is invalid"
         )
     access_token=create_access_token(
@@ -69,16 +79,10 @@ async def authenticate_user(user:users.UserCreate,session):
     return Token(access_token=access_token,token_type="Bearer")
 
 async def get_user(token:str,session):
-    try:
-        payload=jwt.decode(token,SECRET_KEY,algorithms=[ALGORITHM])
-        id=UUID(payload.get("sub"))
-        if id is None:
-            raise HTTPException(status_code=401,detail="User is unauthorized")
-    except InvalidTokenError:
-        raise HTTPException(status_code=401,detail="User is unauthorized")
+    id=await decode_token(token)
     db_user=session.get(users.User,id)
     if db_user is None:
-        raise HTTPException(status_code=422,detail="wow")
+        raise HTTPException(status_code=404,detail="User Not found")
     user=users.UserRead(
         username=db_user.username,
         id=db_user.id,
@@ -88,4 +92,29 @@ async def get_user(token:str,session):
     if user is None:
         raise HTTPException(status_code=401,detail="User is unauthorized")
     return user
+
+async def update_user(token:str,session,user:users.userUpdate)->users.UserRead:
+    id=await decode_token(token)
+    db_user=session.get(users.User,id)
+    if db_user is None:
+        raise HTTPException(
+            status_code=400,detail="User not found"
+        )
+    if user.codeforces_handle is None and user.leetcode_handle is None:
+        raise HTTPException(
+            status_code=400,
+            detail="Atleast one field must be provided"
+        )
+    db_user.sqlmodel_update(user)
+    session.add(db_user)
+    session.commit()
+    session.refresh(db_user)
+    updated_user=users.UserRead(
+        username=db_user.username,
+        id=db_user.id,
+        leetcode_handle=db_user.leetcode_handle,
+        codeforces_handle=db_user.codeforces_handle
+    )
+    return updated_user    
+    
         

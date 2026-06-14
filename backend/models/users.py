@@ -16,3 +16,7 @@ class UserRead(UserBase):
     id:UUID
     leetcode_handle:str|None
     codeforces_handle:str|None
+
+class userUpdate(SQLModel):
+    leetcode_handle:str|None=None
+    codeforces_handle:str|None=None
