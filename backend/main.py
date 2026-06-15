@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
-from backend.database import create_db_and_tables,get_session
+from backend.database import create_db_and_tables
 from backend.routes import userRoutes
 from backend.routes import leetcodeRoutes
 from backend.routes import codeforcesRoutes

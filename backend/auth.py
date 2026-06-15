@@ -10,11 +10,11 @@ from backend.models import users
 from backend.database import SessionDep
 from sqlmodel import select
 from uuid import UUID
+from backend.dependencies import decode_token
+from backend.utils import DUMMY_HASH,get_password_hash,verify_password
 class Token(BaseModel):
     access_token:str
     token_type:str
-password_hash=PasswordHash.recommended()
-DUMMY_HASH=password_hash.hash("test@1234")
 
 def create_access_token(data:dict,expires_delta:timedelta|None=None):
     data_encode=data.copy()
@@ -25,25 +25,16 @@ def create_access_token(data:dict,expires_delta:timedelta|None=None):
     data_encode.update({"exp":expire})
     encode_jwt=jwt.encode(data_encode,SECRET_KEY,algorithm=ALGORITHM)
     return encode_jwt
-async def decode_token(token:str)->UUID:
-    try:
-        payload=jwt.decode(token,SECRET_KEY,algorithms=[ALGORITHM])
-        id=UUID(payload.get("sub"))
-        if id is None:
-            raise HTTPException(status_code=401,detail="User is unauthorized")
-    except InvalidTokenError:
-        raise HTTPException(status_code=401,detail="User is unauthorized")
-    return id
-
-
-def get_password_hash(password):
-    return password_hash.hash(password)
-
-def verify_password(password,hash_password):
-    return password_hash.verify(password,hash_password)
 
 async def create_user(user:users.UserCreate,session):
    hashed_password=get_password_hash(user.password)
+   query=select(users.User).where(users.User.username==user.username)
+   db_user=session.exec(query).first()
+   if db_user != None:
+       raise HTTPException(
+           status_code=400,
+           detail="username already exist"
+       )
    db_user=users.User(
        username=user.username,
        hashed_password=hashed_password
@@ -52,8 +43,11 @@ async def create_user(user:users.UserCreate,session):
     session.add(db_user)
     session.commit()
     session.refresh(db_user)
-   except Exception as e:
-      print(e)
+   except:
+        raise HTTPException(
+            status_code=500,
+            detail="internal server error"
+        )
    access_token=create_access_token(
        data={"sub":str(db_user.id)}
    )
@@ -65,12 +59,12 @@ async def authenticate_user(user:users.UserCreate,session):
     if not db_user:
         verify_password(user.password,DUMMY_HASH)
         raise HTTPException(
-            status_code=404,
+            status_code=401,
             detail="username or password invalid"
         )
     if not verify_password(user.password,db_user.hashed_password):
         raise HTTPException(
-            status_code=404,
+            status_code=400,
             detail="username or password is invalid"
         )
     access_token=create_access_token(

@@ -11,4 +11,4 @@ class codeforcesProfile(SQLModel,table=True):
     rank:str|None=None
     max_rank:str|None=None
     country:str|None=None
-    friends:int|None=None
+    friendsCount:int|None=None

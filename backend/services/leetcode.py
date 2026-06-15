@@ -1,15 +1,15 @@
-from backend.auth import decode_token
+from backend.dependencies import decode_token
 from backend.models import leetcodeStats,users
 from fastapi import HTTPException
 import httpx
-
-def error_api(response):
+import asyncio
+async def error_api(response):
      if response.status_code!=200:
             raise HTTPException(
                 status_code=500,
                 detail="Bad Gateway"
             )
-def error_data(errors):
+async def error_data(errors):
     if errors:
         message = errors[0].get("message", "")
 
@@ -27,10 +27,12 @@ def error_data(errors):
 api="http://localhost:3000/"#currently for testing with docker running alongside 
 async def get_sync_profile(handle):
     async with httpx.AsyncClient() as client:
-        response=await client.get(api+handle+"/profile")
-        response1=await client.get(api+handle+"/contest")
-        error_api(response)
-        error_api(response1)
+        response, response1 = await asyncio.gather(
+        client.get(api + handle + "/profile"),
+        client.get(api + handle + "/contest"),
+     )
+        await error_api(response)
+        await error_api(response1)
         data1=response.json()
         data2=response1.json()
         errors1 = data1.get("errors")
@@ -53,6 +55,11 @@ async def sync_profile(token,session):
         )
   
     user_leetcode_profile=session.get(leetcodeStats.leetcodeProfile,id)
+    if db_user.leetcode_handle is None:
+        raise HTTPException(
+            status_code=400,
+            detail="leetcode handle not provided"
+        )
     data=await get_sync_profile(db_user.leetcode_handle)
     sync_leetcode_profile=leetcodeStats.leetcodeProfile(
          user_id=id,
@@ -84,6 +91,6 @@ async def get_profile(token,session):
     if user_leetcode_profile is None:
         raise HTTPException(
             status_code=404,
-            detail="leetcode profile or user doesnt exist"
+            detail="leetcode profile of user doesnt exist"
         )
     return user_leetcode_profile

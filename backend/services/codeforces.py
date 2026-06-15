@@ -1,4 +1,4 @@
-from backend.auth import decode_token
+from backend.dependencies import decode_token
 from backend.models.users import User
 from fastapi import HTTPException
 from backend.models.codeforcesStats import codeforcesProfile
@@ -11,7 +11,7 @@ flag="&checkHistoricHandles=false"
 async def get_sync_profile(handle):
     async with httpx.AsyncClient() as client:
         response=await client.get(api+handle+flag)
-        error_api(response)
+        await error_api(response)
         data=response.json()
         if data is None:
             raise HTTPException(
@@ -34,6 +34,11 @@ async def sync_profile(token:str,session):
             detail="user not found"
         )
     user_codeforces_profile=session.get(codeforcesProfile,id)
+    if db_user.codeforces_handle is None:
+        raise HTTPException(
+            status_code=400,
+            detail="codeforces handle not provided"
+        )
     data=await get_sync_profile(db_user.codeforces_handle)
     sync_profile=codeforcesProfile(
         id=id,
@@ -44,7 +49,7 @@ async def sync_profile(token:str,session):
         rank=data["result"][0]["rank"],
         max_rank=data["result"][0]["maxRank"],
         country=data["result"][0]["country"],
-        friends=data["result"][0]["friendOfCount"],    
+        friendsCount=data["result"][0]["friendOfCount"],    
         )
     if user_codeforces_profile is None:
         session.add(sync_profile)
