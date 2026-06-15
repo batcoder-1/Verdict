@@ -3,6 +3,7 @@ from typing import Annotated
 from fastapi import Depends
 from backend.models.leetcodeStats import leetcodeProfile
 from backend.models.users import User
+from backend.models.codeforcesStats import codeforcesProfile
 sqlite_file_name="cp_analyzer.db"
 sqlite_url=f"sqlite:///{sqlite_file_name}"
 connect_args={"check_same_thread":False}

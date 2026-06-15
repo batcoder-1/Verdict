@@ -76,16 +76,10 @@ async def sync_profile(token,session):
     session.add(user_leetcode_profile)
     session.commit()
     session.refresh(user_leetcode_profile)
-    
     return user_leetcode_profile
 
 async def get_profile(token,session):
     id=await decode_token(token)
-    if id is None:
-        raise HTTPException(
-            status_code=404,
-            detail="wow"
-        )
     user_leetcode_profile=session.get(leetcodeStats.leetcodeProfile,id)
     if user_leetcode_profile is None:
         raise HTTPException(

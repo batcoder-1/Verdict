@@ -7,7 +7,6 @@ class leetcodeProfile(SQLModel,table=True):
     medium_solved_problems:int|None=None
     easy_solved_problems:int|None=None
     unsolved_problems:int|None=None
-    contest_count:int|None=None
     ranking:int|None=None
     contest_count:int|None=None
     contest_rating:int|None=None

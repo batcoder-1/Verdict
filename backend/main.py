@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from backend.database import create_db_and_tables,get_session
 from backend.routes import userRoutes
 from backend.routes import leetcodeRoutes
+from backend.routes import codeforcesRoutes
 @asynccontextmanager
 async def lifespan(app:FastAPI):
     create_db_and_tables()
@@ -10,6 +11,7 @@ async def lifespan(app:FastAPI):
 app=FastAPI(lifespan=lifespan)
 app.include_router(userRoutes.user)
 app.include_router(leetcodeRoutes.leetcode)
+app.include_router(codeforcesRoutes.codeforces)
 @app.get('/cp_analyzer')
 async def greet():
     return {
