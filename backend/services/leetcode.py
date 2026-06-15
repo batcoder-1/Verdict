@@ -2,18 +2,14 @@ from backend.auth import decode_token
 from backend.models import leetcodeStats,users
 from fastapi import HTTPException
 import httpx
-api="http://localhost:3000/"#currently for testing with docker running alongside 
-async def get_sync_profile(handle):
-    async with httpx.AsyncClient() as client:
-        response=await client.get(api+handle+"/profile")
-        if response.status_code!=200:
+
+def error_api(response):
+     if response.status_code!=200:
             raise HTTPException(
                 status_code=500,
                 detail="Bad Gateway"
             )
-        data=response.json()
-        errors = data.get("errors")
-
+def error_data(errors):
     if errors:
         message = errors[0].get("message", "")
 
@@ -27,8 +23,26 @@ async def get_sync_profile(handle):
         status_code=502,
         detail="LeetCode service unavailable"
     )
-    return data
         
+api="http://localhost:3000/"#currently for testing with docker running alongside 
+async def get_sync_profile(handle):
+    async with httpx.AsyncClient() as client:
+        response=await client.get(api+handle+"/profile")
+        response1=await client.get(api+handle+"/contest")
+        error_api(response)
+        error_api(response1)
+        data1=response.json()
+        data2=response1.json()
+        errors1 = data1.get("errors")
+        errors2=  data2.get("errors")
+        error_data(errors1)
+        error_data(errors2)
+        data={
+            "profile":data1,
+            "contest":data2
+        }
+    return data
+
 async def sync_profile(token,session):
     id=await decode_token(token)
     db_user=session.get(users.User,id)
@@ -37,15 +51,21 @@ async def sync_profile(token,session):
             status_code=404,
             detail="User not found"
         )
+  
     user_leetcode_profile=session.get(leetcodeStats.leetcodeProfile,id)
-    profile=await get_sync_profile(db_user.leetcode_handle)
+    data=await get_sync_profile(db_user.leetcode_handle)
     sync_leetcode_profile=leetcodeStats.leetcodeProfile(
          user_id=id,
-         solved_problems=profile["totalSolved"],
-         hard_solved_problems=profile["hardSolved"],
-         medium_solved_problems=profile["mediumSolved"],
-         easy_solved_problems=profile["easySolved"],
-         ranking=profile["ranking"]
+         solved_problems=data["profile"]["totalSolved"],
+         hard_solved_problems=data["profile"]["hardSolved"],
+         medium_solved_problems=data["profile"]["mediumSolved"],
+         easy_solved_problems=data["profile"]["easySolved"],
+         ranking=data["profile"]["ranking"],
+         contest_count=data["contest"]["contestAttend"],
+         contest_rating=data["contest"]["contestRating"],
+         contest_ranking=data["contest"]["contestGlobalRanking"],
+         contest_percentage=data["contest"]["contestTopPercentage"]
+            
      )
     if user_leetcode_profile is None:
         session.add(sync_leetcode_profile)
@@ -57,4 +77,19 @@ async def sync_profile(token,session):
     session.commit()
     session.refresh(user_leetcode_profile)
     
+    return user_leetcode_profile
+
+async def get_profile(token,session):
+    id=await decode_token(token)
+    if id is None:
+        raise HTTPException(
+            status_code=404,
+            detail="wow"
+        )
+    user_leetcode_profile=session.get(leetcodeStats.leetcodeProfile,id)
+    if user_leetcode_profile is None:
+        raise HTTPException(
+            status_code=404,
+            detail="leetcode profile or user doesnt exist"
+        )
     return user_leetcode_profile
