@@ -1,5 +1,4 @@
 from sqlmodel import Field,SQLModel
-from backend.models.users import User
 from uuid import UUID
 
 class codeforcesProfile(SQLModel,table=True):

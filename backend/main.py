@@ -8,7 +8,7 @@ from backend.routes import codeforcesRoutes
 async def lifespan(app:FastAPI):
     create_db_and_tables()
     yield
-app=FastAPI(lifespan=lifespan)
+app=FastAPI()
 app.include_router(userRoutes.user)
 app.include_router(leetcodeRoutes.leetcode)
 app.include_router(codeforcesRoutes.codeforces)
