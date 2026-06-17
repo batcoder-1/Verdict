@@ -4,10 +4,11 @@ from fastapi import Depends
 from backend.models.leetcodeStats import leetcodeProfile
 from backend.models.users import User
 from backend.models.codeforcesStats import codeforcesProfile
-sqlite_file_name="cp_analyzer.db"
-sqlite_url=f"sqlite:///{sqlite_file_name}"
+from backend.config import DATABASE_URL
+
+database_url=DATABASE_URL
 connect_args={"check_same_thread":False}
-engine=create_engine(sqlite_url,connect_args=connect_args)
+engine=create_engine(database_url)
 
 def create_db_and_tables():
     SQLModel.metadata.create_all(engine)
