@@ -4,6 +4,7 @@ from fastapi import HTTPException
 import httpx
 import asyncio
 from sqlmodel import select
+from datetime import datetime,date
 async def error_api(response):
      if response.status_code!=200:
             raise HTTPException(
@@ -40,23 +41,58 @@ async def sync_contests_api(handle):
 
 async def get_sync_profile(handle):
     async with httpx.AsyncClient() as client:
-        response, response1 = await asyncio.gather(
+        response, response1,response2,response3 = await asyncio.gather(
         client.get(api + handle + "/profile"),
         client.get(api + handle + "/contest"),
+        client.get(api+handle+"/calendar"),
+        client.get(api+handle+f"/calendar?year={datetime.now().year}")
      )
         await error_api(response)
         await error_api(response1)
+        await error_api(response2)
+        await error_api(response3)
         data1=response.json()
         data2=response1.json()
-        errors1 = data1.get("errors")
-        errors2=  data2.get("errors")
+        data3=response2.json()
+        data4=response3.json()
+        errors1=data1.get("errors")
+        errors2=data2.get("errors")
+        errors3=data3.get("errors")
+        errors4=data4.get("errors")
         error_data(errors1)
         error_data(errors2)
+        error_data(errors3)
+        error_data(errors4)
         data={
             "profile":data1,
-            "contest":data2
+            "contest":data2,
+            "calendar":data3,
+            "calendar_current":data4
         }
     return data
+
+def calculate_current_streak(submissions):
+   dates=[]
+   prev=""
+   a=""
+   for i in submissions:
+       if i==':':
+           date=int(a)
+           dates.append(date)
+           a=""
+       if i>='0' and i<='9' and prev=='"':
+            a+=i
+       else:
+           prev=i
+   prevnum=0
+   curr_streak=0
+   for i in reversed(dates):
+       if prevnum!=0:
+           if prevnum-i!=86400:
+               break
+       curr_streak+=1
+       prevnum=i
+   return curr_streak
 
 async def sync_profile(token,session):
     id=await decode_token(token)
@@ -85,7 +121,11 @@ async def sync_profile(token,session):
             contest_count=data["contest"]["contestAttend"],
             contest_rating=data["contest"]["contestRating"],
             contest_ranking=data["contest"]["contestGlobalRanking"],
-            contest_percentage=data["contest"]["contestTopPercentage"]      
+            contest_percentage=data["contest"]["contestTopPercentage"],
+            max_streak_current_year=data["calendar"]["streak"],
+            current_streak=calculate_current_streak(data["calendar_current"]["submissionCalendar"]),
+            last_synced=date.today()
+            
      )
     else:
         sync_leetcode_profile=leetcodeStats.leetcodeProfile(
@@ -94,7 +134,10 @@ async def sync_profile(token,session):
             hard_solved_problems=data["profile"]["hardSolved"],
             medium_solved_problems=data["profile"]["mediumSolved"],
             easy_solved_problems=data["profile"]["easySolved"],
-            ranking=data["profile"]["ranking"],      
+            ranking=data["profile"]["ranking"], 
+            max_streak_current_year=data["calendar"]["streak"],
+            current_streak=calculate_current_streak(data["calendar_current"]["submissionCalendar"]),  
+            last_synced=date.today()
      )
     if user_leetcode_profile is None:
         session.add(sync_leetcode_profile)
@@ -148,7 +191,7 @@ async def sync_contests(token,session):
        ))
        
     leetcode_contests=[]
-    for contest in contests:#what if user has participated in any contest
+    for contest in contests:#what if user has not participated in any contest
         if (db_user.id,contest["contest"]["title"]) in user_contests_name_id:
             continue
         new_contest=leetcodeStats.leetcodeContest(
@@ -158,7 +201,8 @@ async def sync_contests(token,session):
             ranking=contest["ranking"],
             problems_solved=contest["problemsSolved"],
             total_problems=contest["totalProblems"],
-            finishTime=convert_finishTime(contest["finishTimeInSeconds"])
+            finishTime=convert_finishTime(contest["finishTimeInSeconds"]),
+            last_synced=date.today()
         )
         leetcode_contests.append(new_contest)
         session.add(new_contest)

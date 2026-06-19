@@ -1,5 +1,6 @@
 from sqlmodel import SQLModel,Field
 from uuid import UUID
+from datetime import date
 class leetcodeProfile(SQLModel,table=True):
     user_id:UUID=Field(foreign_key="user.id",primary_key=True)
     solved_problems:int|None=None
@@ -12,8 +13,11 @@ class leetcodeProfile(SQLModel,table=True):
     contest_rating:int|None=None
     contest_ranking:int|None=None
     contest_percentage:float|None=None
+    max_streak_current_year:int|None=None
+    current_streak:int|None=None
+    last_synced:date|None=None
 
-class leetcodeContest(SQLModel,table=True):
+class leetcodeContest(SQLModel,table=True):#add last sync as well 
     id:int|None=Field(default=None,primary_key=True)
     user_id:UUID=Field(foreign_key="user.id")
     contest_name:str|None=None
@@ -22,3 +26,4 @@ class leetcodeContest(SQLModel,table=True):
     rating:float|None=None
     ranking:int|None=None
     finishTime:str|None=None
+    last_synced:date|None=None

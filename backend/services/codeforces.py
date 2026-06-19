@@ -5,7 +5,7 @@ from backend.models.codeforcesStats import codeforcesProfile,codeforcesContest
 from backend.services.leetcode import error_api
 from sqlmodel import select
 import httpx
-from datetime import datetime,timezone
+from datetime import datetime,timezone,date
 api="https://codeforces.com/api/user.info?handles="
 contest_api="https://codeforces.com/api/user.rating?handle="
 flag="&checkHistoricHandles=false"
@@ -68,7 +68,8 @@ async def sync_profile(token:str,session):
         rank=data["result"][0]["rank"],
         max_rank=data["result"][0]["maxRank"],
         country=data["result"][0]["country"],
-        friendsCount=data["result"][0]["friendOfCount"],    
+        friendsCount=data["result"][0]["friendOfCount"], 
+        last_synced=date.today()
         )
     if user_codeforces_profile is None:
         session.add(sync_profile)
@@ -124,7 +125,8 @@ async def sync_contest(token:str,session):
             new_rating=contest["newRating"],
             old_rating=contest["oldRating"],
             rank=contest["rank"],
-            contest_date=convert_date(contest["ratingUpdateTimeSeconds"])
+            contest_date=convert_date(contest["ratingUpdateTimeSeconds"]),
+            last_synced=date.today()
         )
         if (new_contest.contest_id,id) in user_contest_userid_contestid:
             continue
