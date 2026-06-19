@@ -2,7 +2,7 @@ from fastapi import APIRouter,Depends
 from backend.auth import Token
 from backend.routes.userRoutes import oauth2_scheme
 from typing import Annotated
-from backend.services.leetcode import sync_profile,get_profile
+from backend.services.leetcode import sync_profile,get_profile,get_contests,sync_contests
 from backend.database import SessionDep
 from backend.models import leetcodeStats
 leetcode=APIRouter()
@@ -18,3 +18,15 @@ async def sync_leetcode_profile(token:Annotated[str,Depends(oauth2_scheme)],sess
 async def leetcode_profile(token:Annotated[str,Depends(oauth2_scheme)],session:SessionDep):
     profile=await get_profile(token,session)
     return profile
+
+@leetcode.post('/cp_analyzer/profile/leetcode/contest/sync',
+        response_model=list[leetcodeStats.leetcodeContest])
+async def sync_leetcode_contests(token:Annotated[str,Depends(oauth2_scheme)],session:SessionDep):
+    contests=await sync_contests(token,session)
+    return contests
+
+@leetcode.get('/cp_analyzer/profile/leetcode/contest',
+              response_model=list[leetcodeStats.leetcodeContest])
+async def get_leetcode_contests(token:Annotated[str,Depends(oauth2_scheme)],session:SessionDep):
+    contests=await get_contests(token,session)
+    return contests

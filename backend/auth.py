@@ -8,10 +8,12 @@ from jwt.exceptions import InvalidTokenError
 from backend.config import ALGORITHM,SECRET_KEY,ACCESS_TOKEN_EXPIRES_MINUTES
 from backend.models import users
 from backend.database import SessionDep
-from sqlmodel import select
+from sqlmodel import select,delete
 from uuid import UUID
 from backend.dependencies import decode_token
 from backend.utils import DUMMY_HASH,get_password_hash,verify_password
+from backend.models.leetcodeStats import leetcodeContest
+from backend.models.codeforcesStats import codeforcesContest
 class Token(BaseModel):
     access_token:str
     token_type:str
@@ -72,6 +74,20 @@ async def authenticate_user(user:users.UserCreate,session):
     )
     return Token(access_token=access_token,token_type="Bearer")
 
+def check_leetcode_user(id,session):
+    query=select(leetcodeContest).where(leetcodeContest.user_id==id)
+    user_leetcode_contest=session.exec(query).all()
+    if len(user_leetcode_contest) > 0:
+        return True
+    return False
+
+def check_codeforces_user(id,session):
+    query=select(codeforcesContest).where(codeforcesContest.user_id==id)
+    user_codeforces_contest=session.exec(query).all()
+    if len(user_codeforces_contest)>0:
+        return True
+    return False
+
 async def get_user(token:str,session):
     id=await decode_token(token)
     db_user=session.get(users.User,id)
@@ -109,6 +125,15 @@ async def update_user(token:str,session,user:users.userUpdate)->users.UserRead:
         leetcode_handle=db_user.leetcode_handle,
         codeforces_handle=db_user.codeforces_handle
     )
+    
+    if check_leetcode_user(id,session):
+        query=delete(leetcodeContest).where(leetcodeContest.user_id==id)
+        session.exec(query)
+    if check_codeforces_user(id,session):
+        query1=delete(codeforcesContest).where(codeforcesContest.user_id==id)
+        session.exec(query1)
+        
+    session.commit()
     return updated_user    
     
         

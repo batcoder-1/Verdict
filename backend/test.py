@@ -1,7 +1,9 @@
 import requests
+from models import leetcodeStats
 handle="?handles=k_ni_ght"
-api="https://codeforces.com/api/user.info"+handle+"&checkHistoricHandles=false"
+api="https://codeforces.com/api/user.rating?handle=k_ni_ght"
 res=requests.get(api)
-data=res.json()
-# print(type(data["result"][0]["rank"]))
-print(data["status"])
+contest=res.json()
+for i in contest["result"]:
+    print(i)
+    
