@@ -87,8 +87,10 @@ def calculate_current_streak(submissions):
    prevnum=0
    curr_streak=0
    for i in reversed(dates):
+       d1=datetime.fromtimestamp(prevnum).date()
+       d2=datetime.fromtimestamp(i).date()
        if prevnum!=0:
-           if prevnum-i!=86400:
+           if (d1-d2).days>1:
                break
        curr_streak+=1
        prevnum=i

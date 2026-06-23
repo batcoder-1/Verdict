@@ -12,7 +12,9 @@ class codeforcesProfile(SQLModel,table=True):
     country:str|None=None
     friendsCount:int|None=None
     last_synced:date|None=None
-    #add last synced here as well 
+    current_streak:int|None=None
+    current_year_longest_streak:int|None=None
+    last_submission_id:int|None=None
 class codeforcesContest(SQLModel,table=True):#add last_sync as well 
     user_id:UUID=Field(foreign_key="user.id")
     id:int=Field(primary_key=True,default=None)
