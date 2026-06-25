@@ -1,12 +1,25 @@
+import Logo from "../common/Logo";
+import Button from "../common/Button";
+import Container from "../common/Container";
+
 function Navbar() {
   return (
-    <nav
-      style={{
-        padding: "1rem",
-        borderBottom: "1px solid #333",
-      }}
-    >
-      Verdict
+    <nav className="border-b border-zinc-800 bg-zinc-950">
+      <Container>
+        <div className="flex h-16 items-center justify-between">
+          <Logo />
+
+          <div className="flex gap-3">
+            <Button variant="secondary">
+              GitHub
+            </Button>
+
+            <Button>
+              Get Started
+            </Button>
+          </div>
+        </div>
+      </Container>
     </nav>
   );
 }
