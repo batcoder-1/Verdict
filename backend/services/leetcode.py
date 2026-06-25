@@ -161,8 +161,8 @@ async def get_profile(token,session):
             detail="leetcode profile of user doesn't exist"
         )
     return user_leetcode_profile
-#here fetch all the contest of user if it exist store it in map or set and then check for (user id+contest name and if its doesnt exist then only add it)
-def convert_finishTime(time): # only non existing contest will get added fix it
+
+def convert_finishTime(time): 
     ratio=time/3600
     hours=int(ratio)
     minutes=int((float(ratio)-int(ratio))*60)
@@ -193,7 +193,7 @@ async def sync_contests(token,session):
        ))
        
     leetcode_contests=[]
-    for contest in contests:#what if user has not participated in any contest
+    for contest in contests:
         if (db_user.id,contest["contest"]["title"]) in user_contests_name_id:
             continue
         new_contest=leetcodeStats.leetcodeContest(

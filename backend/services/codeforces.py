@@ -257,7 +257,7 @@ async def sync_contest(token:str,session):
     for contest in user_contest:
         user_contest_userid_contestid.add((contest.contest_id,contest.user_id))
     codeforces_contest=[]
-    for contest in contests["result"]: # what if user has not participated in an any contest
+    for contest in contests["result"]: 
         new_contest=codeforcesContest(
             user_id=id,
             contest_name=contest["contestName"],
