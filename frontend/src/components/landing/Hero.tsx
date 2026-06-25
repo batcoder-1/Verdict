@@ -1,34 +1,28 @@
+import { Link } from "react-router-dom";
 import Button from "../common/Button";
 import Container from "../common/Container";
 
 function Hero() {
   return (
-    <section className="py-32">
-      <Container>
-        <div className="mx-auto max-w-4xl text-center">
+    <Container>
+      <section className="flex min-h-[75vh] flex-col items-center justify-center text-center">
+        <h1 className="mb-6 text-6xl font-bold">
+          Track Your
+          <span className="text-blue-500"> Competitive Programming</span>
+          <br />
+          Journey
+        </h1>
 
-          <span className="rounded-full border border-zinc-800 px-4 py-2 text-sm text-zinc-400">
-            Now tracking LeetCode + Codeforces
-          </span>
+        <p className="mb-8 max-w-2xl text-lg text-zinc-400">
+          Sync your LeetCode and Codeforces profiles, analyze your progress,
+          monitor contests, and visualize your competitive programming journey.
+        </p>
 
-          <h1 className="mt-8 text-6xl font-bold tracking-tight">
-            Analyze Your Competitive Programming Journey
-          </h1>
-
-          <p className="mx-auto mt-6 max-w-2xl text-xl text-zinc-400">
-            Track LeetCode and Codeforces performance in one unified dashboard.
-          </p>
-
-          <div className="mt-10 flex justify-center gap-4">
-            <Button>Get Started</Button>
-            <Button variant="secondary">
-              GitHub Repository
-            </Button>
-          </div>
-
-        </div>
-      </Container>
-    </section>
+        <Link to="/login">
+          <Button>Get Started</Button>
+        </Link>
+      </section>
+    </Container>
   );
 }
 
