@@ -1,6 +1,6 @@
-# 🚀 CP Analyzer Backend
+# Verdict
 
-**CP Analyzer** is a robust backend service designed to aggregate, analyze, and track competitive programming profiles. Built with **FastAPI**, it allows users to sync their performance statistics, contest histories, and activity streaks from platforms like **LeetCode** and **Codeforces** into a centralized database.
+**Verdict** is a robust backend service designed to aggregate, analyze, and track competitive programming profiles. Built with **FastAPI**, it allows users to sync their performance statistics, contest histories, and activity streaks from platforms like **LeetCode** and **Codeforces** into a centralized database.
 
 ---
 
