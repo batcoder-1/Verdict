@@ -3,7 +3,6 @@ import type { ReactNode } from "react";
 import type { User } from "../types/user";
 import { getProfile } from "../api/user";
 import { logout as logoutApi } from "../api/auth";
-
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
