@@ -13,7 +13,7 @@ flag="&checkHistoricHandles=false"
 
 async def get_streak(handle,start,offset):
     streak_api=f"https://codeforces.com/api/user.status?handle={handle}&from={start}&count={offset}"
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(timeout=15) as client:
         response=await client.get(streak_api)
         await error_api(response)
         data=response.json()

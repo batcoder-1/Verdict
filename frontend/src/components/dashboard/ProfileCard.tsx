@@ -3,7 +3,7 @@ import Card from "../common/Card";
 import Button from "../common/Button";
 import { useAuth } from "../../hooks/useAuth";
 import { updateProfile } from "../../api/user";
-
+import { toast } from "sonner";
 function ProfileCard() {
   const { user, setCurrentUser } = useAuth();
 
@@ -19,19 +19,21 @@ function ProfileCard() {
 
   const handleSave = async () => {
     try {
-      setSaving(true);
+    setSaving(true);
 
-      const updatedUser = await updateProfile({
+    const updatedUser = await updateProfile({
         leetcode_handle: leetcodeHandle || undefined,
         codeforces_handle: codeforcesHandle || undefined,
-      });
+    });
 
-      setCurrentUser(updatedUser);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setSaving(false);
-    }
+    setCurrentUser(updatedUser);
+
+    toast.success("Profile updated successfully!");
+} catch {
+    toast.error("Failed to update profile.");
+} finally {
+    setSaving(false);
+}
   };
 
   return (

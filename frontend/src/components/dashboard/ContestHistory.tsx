@@ -1,129 +1,126 @@
-import { useEffect, useState } from "react";
+import type { Dispatch, SetStateAction } from "react";
+
 import {
-  getLeetCodeContests,
   syncLeetCodeContests,
-  getCodeforcesContests,
   syncCodeforcesContests,
 } from "../../api/contest";
+
 import type { LeetCodeContest } from "../../types/leetcode";
 import type { CodeforcesContest } from "../../types/codeforces";
 
-const ContestHistory = () => {
-  const [leetcode, setLeetcode] = useState<LeetCodeContest[]>([]);
-  const [codeforces, setCodeforces] = useState<CodeforcesContest[]>([]);
-  const [loading, setLoading] = useState(true);
+import SectionCard from "../common/SectionCard";
+import Button from "../common/Button";
+import { toast } from "sonner";
+interface ContestHistoryProps {
+  leetcode: LeetCodeContest[];
+  codeforces: CodeforcesContest[];
+  loading: boolean;
 
-  const fetchContests = async () => {
-    try {
-      const [lc, cf] = await Promise.all([
-        getLeetCodeContests(),
-        getCodeforcesContests(),
-      ]);
+  setLeetcode: Dispatch<SetStateAction<LeetCodeContest[]>>;
+  setCodeforces: Dispatch<SetStateAction<CodeforcesContest[]>>;
+}
 
-      setLeetcode(lc);
-      setCodeforces(cf);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchContests();
-  }, []);
-
+const ContestHistory = ({
+  leetcode,
+  codeforces,
+  setLeetcode,
+  setCodeforces,
+}: ContestHistoryProps) => {
   const handleLeetCodeSync = async () => {
+  try {
     const contests = await syncLeetCodeContests();
+
     setLeetcode(contests);
-  };
+
+    toast.success("LeetCode contests synced successfully!");
+  } catch {
+    toast.error("Failed to sync LeetCode contests.");
+  }
+};
 
   const handleCodeforcesSync = async () => {
+  try {
     const contests = await syncCodeforcesContests();
-    setCodeforces(contests);
-  };
 
-  if (loading) {
-    return (
-      <div className="rounded-xl border p-6">
-        Loading contests...
-      </div>
-    );
+    setCodeforces(contests);
+
+    toast.success("Codeforces contests synced successfully!");
+  } catch {
+    toast.error("Failed to sync Codeforces contests.");
   }
+};
 
   return (
     <div className="space-y-8">
-      {/* LeetCode */}
-      <div className="rounded-xl border p-6">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-xl font-semibold">LeetCode Contests</h2>
-
-          <button
-            onClick={handleLeetCodeSync}
-            className="rounded bg-green-600 px-3 py-2 text-white"
-          >
+      <SectionCard
+        title="LeetCode Contests"
+        action={
+          <Button onClick={handleLeetCodeSync}>
             Sync
-          </button>
-        </div>
-
+          </Button>
+        }
+      >
         <table className="w-full text-left">
           <thead>
-            <tr>
-              <th>Contest</th>
-              <th>Solved</th>
-              <th>Rating</th>
-              <th>Rank</th>
+            <tr className="border-b border-zinc-700">
+              <th className="pb-3">Contest</th>
+              <th className="pb-3">Solved</th>
+              <th className="pb-3">Rating</th>
+              <th className="pb-3">Rank</th>
             </tr>
           </thead>
 
           <tbody>
             {leetcode.map((contest) => (
-              <tr key={contest.id}>
-                <td>{contest.contest_name}</td>
-                <td>
+              <tr
+                key={contest.id}
+                className="border-b border-zinc-800 hover:bg-zinc-900"
+              >
+                <td className="py-3">{contest.contest_name}</td>
+                <td className="py-3">
                   {contest.problems_solved}/{contest.total_problems}
                 </td>
-                <td>{contest.rating}</td>
-                <td>{contest.ranking}</td>
+                <td className="py-3">{contest.rating}</td>
+                <td className="py-3">{contest.ranking}</td>
               </tr>
             ))}
           </tbody>
         </table>
-      </div>
+      </SectionCard>
 
-      {/* Codeforces */}
-      <div className="rounded-xl border p-6">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-xl font-semibold">Codeforces Contests</h2>
-
-          <button
-            onClick={handleCodeforcesSync}
-            className="rounded bg-green-600 px-3 py-2 text-white"
-          >
+      <SectionCard
+        title="Codeforces Contests"
+        action={
+          <Button onClick={handleCodeforcesSync}>
             Sync
-          </button>
-        </div>
-
+          </Button>
+        }
+      >
         <table className="w-full text-left">
           <thead>
-            <tr>
-              <th>Contest</th>
-              <th>Rank</th>
-              <th>Old Rating</th>
-              <th>New Rating</th>
+            <tr className="border-b border-zinc-700">
+              <th className="pb-3">Contest</th>
+              <th className="pb-3">Rank</th>
+              <th className="pb-3">Old Rating</th>
+              <th className="pb-3">New Rating</th>
             </tr>
           </thead>
 
           <tbody>
             {codeforces.map((contest) => (
-              <tr key={contest.id}>
-                <td>{contest.contest_name}</td>
-                <td>{contest.rank}</td>
-                <td>{contest.old_rating}</td>
-                <td>{contest.new_rating}</td>
+              <tr
+                key={contest.id}
+                className="border-b border-zinc-800 hover:bg-zinc-900"
+              >
+                <td className="py-3">{contest.contest_name}</td>
+                <td className="py-3">{contest.rank}</td>
+                <td className="py-3">{contest.old_rating}</td>
+                <td className="py-3">{contest.new_rating}</td>
               </tr>
             ))}
           </tbody>
         </table>
-      </div>
+      </SectionCard>
     </div>
   );
 };
