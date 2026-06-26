@@ -4,7 +4,20 @@ import {
   syncCodeforcesProfile,
 } from "../../api/codeforces";
 import type { CodeforcesProfile } from "../../types/codeforces";
-
+import SectionCard from "../common/SectionCard";
+import Button from "../common/Button";
+import StatCard from "../common/StatCard";
+import {
+  Trophy,
+  Flame,
+  TrendingUp,
+  Medal,
+  Users,
+  Globe,
+  Award,
+  Crown,
+} from "lucide-react";
+import { toast } from "sonner";
 const CodeforcesCard = () => {
   const [profile, setProfile] = useState<CodeforcesProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -27,64 +40,101 @@ const CodeforcesCard = () => {
   }, []);
 
   const handleSync = async () => {
-    try {
-      setSyncing(true);
-      const data = await syncCodeforcesProfile();
-      setProfile(data);
-    } catch {
-      setError("Failed to sync Codeforces profile");
-    } finally {
-      setSyncing(false);
-    }
-  };
+  try {
+    setSyncing(true);
+
+    const data = await syncCodeforcesProfile();
+    setProfile(data);
+
+    toast.success("Codeforces profile synced successfully!");
+  } catch {
+    setError("Failed to sync Codeforces profile");
+    toast.error("Failed to sync Codeforces profile.");
+  } finally {
+    setSyncing(false);
+  }
+};
 
   if (loading) {
     return (
-      <div className="rounded-xl border p-6">
+      <SectionCard title="Codeforces">
         Loading...
-      </div>
+      </SectionCard>
     );
   }
 
   if (error) {
     return (
-      <div className="rounded-xl border p-6 text-red-500">
-        {error}
-      </div>
+      <SectionCard title="Codeforces">
+        <p className="text-red-500">{error}</p>
+      </SectionCard>
     );
   }
 
   return (
-    <div className="rounded-xl border p-6 space-y-3">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Codeforces</h2>
+  <SectionCard
+    title="Codeforces"
+    action={
+      <Button onClick={handleSync} disabled={syncing}>
+        {syncing ? "Syncing..." : "Sync"}
+      </Button>
+    }
+  >
+    <div className="grid grid-cols-2 gap-4">
+      <StatCard
+        title="Rating"
+        value={profile?.rating ?? "N/A"}
+        icon={<TrendingUp size={18} />}
+      />
 
-        <button
-          onClick={handleSync}
-          disabled={syncing}
-          className="rounded bg-green-600 px-3 py-2 text-white hover:bg-green-700 disabled:opacity-50"
-        >
-          {syncing ? "Syncing..." : "Sync"}
-        </button>
-      </div>
+      <StatCard
+        title="Max Rating"
+        value={profile?.max_rating ?? "N/A"}
+        icon={<Trophy size={18} />}
+      />
 
-      <p>Rating: {profile?.rating ?? "N/A"}</p>
-      <p>Max Rating: {profile?.max_rating ?? "N/A"}</p>
-      <p>Rank: {profile?.rank ?? "N/A"}</p>
-      <p>Max Rank: {profile?.max_rank ?? "N/A"}</p>
-      <p>Country: {profile?.country ?? "N/A"}</p>
-      <p>Friends: {profile?.friendsCount ?? "N/A"}</p>
+      <StatCard
+        title="Rank"
+        value={profile?.rank ?? "N/A"}
+        icon={<Award size={18} />}
+      />
 
-      <hr />
+      <StatCard
+        title="Max Rank"
+        value={profile?.max_rank ?? "N/A"}
+        icon={<Crown size={18} />}
+      />
 
-      <p>Current Streak: {profile?.current_streak ?? "N/A"}</p>
-      <p>Best Streak: {profile?.current_year_longest_streak ?? "N/A"}</p>
+      <StatCard
+        title="Current Streak"
+        value={profile?.current_streak ?? 0}
+        icon={<Flame size={18} />}
+      />
 
-      <p className="text-sm text-gray-500">
-        Last Synced: {profile?.last_synced ?? "Never"}
-      </p>
+      <StatCard
+        title="Current Year Best Streak"
+        value={profile?.current_year_longest_streak ?? 0}
+        icon={<Medal size={18} />}
+      />
+
+      <StatCard
+        title="Country"
+        value={profile?.country ?? "N/A"}
+        icon={<Globe size={18} />}
+      />
+
+      <StatCard
+        title="Friends"
+        value={profile?.friendsCount ?? 0}
+        icon={<Users size={18} />}
+      />
     </div>
-  );
+
+    <p className="mt-6 text-right text-xs text-zinc-500">
+      Last Synced: {profile?.last_synced ?? "Never"}
+    </p>
+  </SectionCard>
+);
 };
 
 export default CodeforcesCard;

@@ -1,15 +1,32 @@
+import { Link } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
+
 import ProfileForm from "../components/profile/ProfileForm";
 
 const ProfilePage = () => {
-    return (
-        <div className="container mx-auto py-8">
-            <h1 className="text-3xl font-bold mb-6">
-                Edit Profile
-            </h1>
+  return (
+    <div className="mx-auto max-w-3xl space-y-8">
+      <Link
+        to="/dashboard"
+        className="inline-flex items-center gap-2 text-zinc-400 transition hover:text-white"
+      >
+        <ArrowLeft size={18} />
+        Back to Dashboard
+      </Link>
 
-            <ProfileForm />
-        </div>
-    );
+      <div>
+        <h1 className="text-4xl font-bold">
+          Account Settings
+        </h1>
+
+        <p className="mt-2 text-zinc-400">
+          Manage your competitive programming profiles.
+        </p>
+      </div>
+
+      <ProfileForm />
+    </div>
+  );
 };
 
 export default ProfilePage;
