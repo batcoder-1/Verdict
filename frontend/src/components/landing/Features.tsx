@@ -4,18 +4,27 @@ import Container from "../common/Container";
 const features = [
   {
     title: "LeetCode Analytics",
-    description:
-      "Track solved problems, contest ratings, rankings and coding streaks.",
+    description: "Track solved problems, rankings, streaks and contest ratings.",
   },
   {
     title: "Codeforces Analytics",
-    description:
-      "Monitor ratings, ranks, contests and submission activity.",
+    description: "Monitor rating progression and contest performance.",
   },
   {
     title: "Contest History",
-    description:
-      "View all past contests with detailed performance statistics.",
+    description: "Browse your complete contest history with detailed statistics.",
+  },
+  {
+    title: "Rating Charts",
+    description: "Visualize your rating progression over time.",
+  },
+  {
+    title: "One-click Sync",
+    description: "Refresh your profiles instantly from both platforms.",
+  },
+  {
+    title: "Secure Authentication",
+    description: "JWT-based authentication with protected routes.",
   },
 ];
 
