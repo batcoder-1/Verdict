@@ -1,5 +1,5 @@
-from backend.dependencies import decode_token
-from backend.models import leetcodeStats,users
+from dependencies import decode_token
+from models import leetcodeStats,users
 from fastapi import HTTPException
 import httpx
 import asyncio

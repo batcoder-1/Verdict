@@ -5,15 +5,15 @@ from fastapi import HTTPException,status
 from pwdlib import PasswordHash
 from pydantic import BaseModel
 from jwt.exceptions import InvalidTokenError
-from backend.config import ALGORITHM,SECRET_KEY,ACCESS_TOKEN_EXPIRES_MINUTES
-from backend.models import users
-from backend.database import SessionDep
+from config import ALGORITHM,SECRET_KEY,ACCESS_TOKEN_EXPIRES_MINUTES
+from models import users
+from database import SessionDep
 from sqlmodel import select,delete
 from uuid import UUID
-from backend.dependencies import decode_token
-from backend.utils import DUMMY_HASH,get_password_hash,verify_password
-from backend.models.leetcodeStats import leetcodeContest
-from backend.models.codeforcesStats import codeforcesContest
+from dependencies import decode_token
+from utils import DUMMY_HASH,get_password_hash,verify_password
+from models.leetcodeStats import leetcodeContest
+from models.codeforcesStats import codeforcesContest
 class Token(BaseModel):
     access_token:str
     token_type:str

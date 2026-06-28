@@ -1,11 +1,11 @@
 from fastapi import APIRouter,Depends
-from backend.auth import Token
-from backend.routes.userRoutes import oauth2_scheme
+from auth import Token
+from routes.userRoutes import oauth2_scheme
 from typing import Annotated
-from backend.services.leetcode import sync_profile,get_profile,get_contests,sync_contests
-from backend.database import SessionDep
-from backend.models import leetcodeStats
-from backend.dependencies import get_access_token
+from services.leetcode import sync_profile,get_profile,get_contests,sync_contests
+from database import SessionDep
+from models import leetcodeStats
+from dependencies import get_access_token
 leetcode=APIRouter()
 
 @leetcode.post('/cp_analyzer/profile/leetcode/sync',

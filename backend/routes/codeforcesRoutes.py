@@ -1,10 +1,10 @@
 from fastapi import APIRouter,Depends
-from backend.routes.userRoutes import oauth2_scheme
+from routes.userRoutes import oauth2_scheme
 from typing import Annotated
-from backend.database import SessionDep
-from backend.models.codeforcesStats import codeforcesProfile,codeforcesContest
-from backend.services.codeforces import sync_profile,get_profile,sync_contest,get_contest
-from backend.dependencies import get_access_token
+from database import SessionDep
+from models.codeforcesStats import codeforcesProfile,codeforcesContest
+from services.codeforces import sync_profile,get_profile,sync_contest,get_contest
+from dependencies import get_access_token
 codeforces=APIRouter()
 
 @codeforces.post('/cp_analyzer/profile/codeforces/sync',

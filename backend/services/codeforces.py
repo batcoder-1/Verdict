@@ -1,8 +1,8 @@
-from backend.dependencies import decode_token
-from backend.models.users import User
+from dependencies import decode_token
+from models.users import User
 from fastapi import HTTPException
-from backend.models.codeforcesStats import codeforcesProfile,codeforcesContest
-from backend.services.leetcode import error_api
+from models.codeforcesStats import codeforcesProfile,codeforcesContest
+from services.leetcode import error_api
 from sqlmodel import select
 from datetime import timedelta,datetime,date
 import httpx

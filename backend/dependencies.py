@@ -2,7 +2,7 @@ from uuid import UUID
 from fastapi import HTTPException,Request
 from jwt.exceptions import InvalidTokenError
 import jwt
-from backend.config import SECRET_KEY,ALGORITHM
+from config import SECRET_KEY,ALGORITHM
 
 async def decode_token(token:str)->UUID:
     try:

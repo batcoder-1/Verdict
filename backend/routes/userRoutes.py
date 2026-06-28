@@ -1,11 +1,11 @@
 from fastapi import APIRouter,Depends,Response
 from fastapi.security import OAuth2PasswordRequestForm,OAuth2PasswordBearer
 from typing import Annotated
-from backend.auth import Token,create_user,authenticate_user,get_user,update_user
-from backend.models import users
-from backend.database import SessionDep
-from backend.dependencies import get_access_token
-from backend.config import ACCESS_TOKEN_EXPIRES_MINUTES
+from auth import Token,create_user,authenticate_user,get_user,update_user
+from models import users
+from database import SessionDep
+from dependencies import get_access_token
+from config import ACCESS_TOKEN_EXPIRES_MINUTES
 user=APIRouter()
 oauth2_scheme=OAuth2PasswordBearer(tokenUrl="/cp_analyzer/login")
 @user.post('/cp_analyzer/signup',
