@@ -21,8 +21,8 @@ async def login(response:Response,form_data:Annotated[OAuth2PasswordRequestForm,
         key="access_token",
         value=token.access_token,
         httponly=True,
-        secure=False,
-        samesite="lax",
+        secure=True,
+        samesite="none",
         max_age=ACCESS_TOKEN_EXPIRES_MINUTES * 60,
     )
     return {"message":"Login Successfull"}
