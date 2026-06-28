@@ -26,7 +26,7 @@ async def error_data(errors):
         detail="LeetCode service unavailable"
     )
         
-api="http://localhost:3000/"#currently for testing with docker running alongside 
+api="https://alfa-leetcode-api.onrender.com/" 
 
 
 async def sync_contests_api(handle):
