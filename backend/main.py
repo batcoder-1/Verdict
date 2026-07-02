@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
-from backend.routes import userRoutes
-from backend.routes import leetcodeRoutes
-from backend.routes import codeforcesRoutes
+from routes import userRoutes
+from routes import leetcodeRoutes
+from routes import codeforcesRoutes
 from fastapi.middleware.cors import CORSMiddleware
 app=FastAPI()
 app.add_middleware(
