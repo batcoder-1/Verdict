@@ -8,7 +8,8 @@ app=FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-       "https://verdict-uhvt.vercel.app"
+       "https://verdict-uhvt.vercel.app",
+       "https://verdict-uhvt-fq3qyvws1-naman-dadhich-s-projects.vercel.app"
     ],
     allow_credentials=True,
     allow_methods=["*"],
